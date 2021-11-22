@@ -1,0 +1,12 @@
+body {
+
+    background-image: url("f1.jpg");
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+  }
+
+  p{
+      font-size: 20px;
+  }
