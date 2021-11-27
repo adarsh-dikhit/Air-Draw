@@ -9,7 +9,7 @@ from keras.models import load_model
 import numpy as np
 import os
 from collections import deque
-from flask import Flask,render_template,Response
+from flask import Flask,render_template,Response, redirect, url_for
 
 app=Flask(__name__)
 
@@ -184,7 +184,9 @@ def video():
 
     cap = cv2.VideoCapture(0)
     print("going to generate frames function")
-    return Response(generate_frames(colorIndex,paintWindow,colors,kernel,bpoints,gpoints,rpoints,ypoints,blue_index,green_index,red_index,yellow_index),mimetype='multipart/x-mixed-replace; boundary=frame')
+    generate_frames(colorIndex,paintWindow,colors,kernel,bpoints,gpoints,rpoints,ypoints,blue_index,green_index,red_index,yellow_index)
+    return redirect(url_for('index'))
+    # return Response(generate_frames(colorIndex,paintWindow,colors,kernel,bpoints,gpoints,rpoints,ypoints,blue_index,green_index,red_index,yellow_index),mimetype='multipart/x-mixed-replace; boundary=frame')
 
 
 
@@ -314,7 +316,9 @@ def emoji():
     cv2.namedWindow('Single-Threaded Detection', cv2.WINDOW_NORMAL)
 
     print("going to generate frames function")
-    return Response(generate_emoji(cap, detection_graph, sess, num_hands_detect, im_width, im_height, model, emojis),mimetype='multipart/x-mixed-replace; boundary=frame')
+    generate_emoji(cap, detection_graph, sess, num_hands_detect, im_width, im_height, model, emojis)
+    return redirect(url_for('index'))
+    # return Response(generate_emoji(cap, detection_graph, sess, num_hands_detect, im_width, im_height, model, emojis),mimetype='multipart/x-mixed-replace; boundary=frame')
 
 if __name__=="__main__":
     print("inside main")

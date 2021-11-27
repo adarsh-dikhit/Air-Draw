@@ -10,21 +10,23 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
     <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/mainpage.css') }}">
-  <title>AIR CANVAS | HCI Project</title>
+
+  <title>AIR CANVAS | EMOJINATOR</title>
 </head>
 
 <body>
   <br>
   <center>
     <h1><b>Welcome to Air Canvas!</b></h1>
-    <form action="{{url_for('video')}}"><br><br>
-      <p><b>Ever wanted to draw your imagination by just waving your finger in the air?<br>Our software allows you to
-          capture what you draw in air!<br>Don't believe us? Go ahead and click on the button below! </b></p><br><br><br>
-      <p>Emojis are ideograms and smileys used in electronic messages and web pages.<br> Emoji exist in various genres, including facial expressions, common objects, places and types of weather, and animals.<br> Our software helps you to recognize and classify different hand emojis! Click on the button below to start!</p>    
-      <input class="btn btn-primary" type="submit" value="CANVAS!">
-  </form> <br>
-  <form action="{{url_for('emoji')}}">
-    <input class="btn btn-primary" type="submit" value="EMOJI!">
+    <form action="{{url_for('video')}}"><br><br><br><br>
+      <h4><b>Ever wanted to draw your imagination by just waving your finger in the air?<br>Our software allows you to
+          capture what you draw in air!<br>Don't believe us? Go ahead and click on the button below!</b> </h4><br>
+        
+      <input class="btn btn-primary" type="submit" value="LET'S DRAW!">
+  </form> <br><br><br>
+  <form action="{{url_for('emoji')}}"><h4><b>Emojis are ideograms and smileys used in electronic messages and web pages.<br>
+     Our software helps you to recognize and classify different hand emojis!<br>Click on the button below to start!</b></h4><br>  
+    <input class="btn btn-primary" type="submit" value="DETECT MY EMOJI!">
   </form>
  </center>
 
