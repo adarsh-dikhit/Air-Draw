@@ -48,7 +48,7 @@ def generate_frames(colorIndex,paintWindow,colors,kernel,bpoints,gpoints,rpoints
         cv2.putText(frame, "GREEN", (298, 33), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2, cv2.LINE_AA)
         cv2.putText(frame, "RED", (420, 33), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2, cv2.LINE_AA)
         cv2.putText(frame, "YELLOW", (520, 33), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (150,150,150), 2, cv2.LINE_AA)
-        # cv2.putText(frame, "YELLOW", (520, 33), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (150,150,150), 2, cv2.LINE_AA)
+        cv2.putText(frame, "BACK", (520, 444), cv2.FONT_HERSHEY_SIMPLEX, 0.3, (150,150,150), 1, cv2.LINE_AA)
 
     
         Mask = cv2.inRange(hsv, Lower_hsv, Upper_hsv)
