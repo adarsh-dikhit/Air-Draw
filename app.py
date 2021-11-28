@@ -42,13 +42,13 @@ def generate_frames(colorIndex,paintWindow,colors,kernel,bpoints,gpoints,rpoints
         frame = cv2.rectangle(frame, (275,1), (370,65), colors[1], -1)
         frame = cv2.rectangle(frame, (390,1), (485,65), colors[2], -1)
         frame = cv2.rectangle(frame, (505,1), (600,65), colors[3], -1)
-        frame = cv2.rectangle(frame, (573,422), (639,478), (122,122,122), -1)
+        frame = cv2.rectangle(frame, (570,422), (640,478), (122,122,122), -1)
         cv2.putText(frame, "CLEAR ALL", (49, 33), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2, cv2.LINE_AA)
         cv2.putText(frame, "BLUE", (185, 33), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2, cv2.LINE_AA)
         cv2.putText(frame, "GREEN", (298, 33), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2, cv2.LINE_AA)
         cv2.putText(frame, "RED", (420, 33), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2, cv2.LINE_AA)
         cv2.putText(frame, "YELLOW", (520, 33), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (150,150,150), 2, cv2.LINE_AA)
-        cv2.putText(frame, "BACK", (520, 444), cv2.FONT_HERSHEY_SIMPLEX, 0.3, (150,150,150), 1, cv2.LINE_AA)
+        cv2.putText(frame, "PAUSE", (582, 455), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2, cv2.LINE_AA)
 
     
         Mask = cv2.inRange(hsv, Lower_hsv, Upper_hsv)
@@ -68,6 +68,8 @@ def generate_frames(colorIndex,paintWindow,colors,kernel,bpoints,gpoints,rpoints
             cv2.circle(frame, (int(x), int(y)), int(radius), (0, 255, 255), 2)
             M = cv2.moments(cnt)
             center = (int(M['m10'] / M['m00']), int(M['m01'] / M['m00']))
+            if center[1] >= 422 and center[0] >= 570:
+                  break
             if center[1] <= 65:
                 if 40 <= center[0] <= 140: 
                     bpoints = [deque(maxlen=512)]
@@ -88,7 +90,7 @@ def generate_frames(colorIndex,paintWindow,colors,kernel,bpoints,gpoints,rpoints
                 elif 390 <= center[0] <= 485:
                         colorIndex = 2 
                 elif 505 <= center[0] <= 600:
-                        colorIndex = 3 
+                        colorIndex = 3    
             else :
                 if colorIndex == 0:
                     bpoints[blue_index].appendleft(center)
@@ -128,10 +130,9 @@ def generate_frames(colorIndex,paintWindow,colors,kernel,bpoints,gpoints,rpoints
                 b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')  # concat frame one by one and show result
         if cv2.waitKey(1) & 0xFF == ord("q"):
             break
-
-
     cap.release()
     cv2.destroyAllWindows()
+    # return redirect(url_for('index'))
 
 #def setValues(x):
  #  print("")
@@ -154,7 +155,6 @@ def video_feed():
     cv2.createTrackbar("Lower Hue", "Color detectors", 88, 180,setValues)
     cv2.createTrackbar("Lower Saturation", "Color detectors", 108, 255,setValues)
     cv2.createTrackbar("Lower Value", "Color detectors", 76, 255,setValues)
-
 
     bpoints = [deque(maxlen=1024)]
     gpoints = [deque(maxlen=1024)]
@@ -181,14 +181,12 @@ def video_feed():
     paintWindow = cv2.rectangle(paintWindow, (390,1), (485,65), colors[2], -1)
     paintWindow = cv2.rectangle(paintWindow, (505,1), (600,65), colors[3], -1)
 
-    cv2.putText(paintWindow, "CLEAR", (49, 33), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2, cv2.LINE_AA)
-    cv2.putText(paintWindow, "BLUE", (185, 33), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2, cv2.LINE_AA)
-    cv2.putText(paintWindow, "GREEN", (298, 33), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2, cv2.LINE_AA)
-    cv2.putText(paintWindow, "RED", (420, 33), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2, cv2.LINE_AA)
-    cv2.putText(paintWindow, "YELLOW", (520, 33), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (150,150,150), 2, cv2.LINE_AA)
-    cv2.namedWindow('Paint', cv2.WINDOW_AUTOSIZE)
-
-
+    # cv2.putText(paintWindow, "CLEAR", (49, 33), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2, cv2.LINE_AA)
+    # cv2.putText(paintWindow, "BLUE", (185, 33), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2, cv2.LINE_AA)
+    # cv2.putText(paintWindow, "GREEN", (298, 33), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2, cv2.LINE_AA)
+    # cv2.putText(paintWindow, "RED", (420, 33), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2, cv2.LINE_AA)
+    # cv2.putText(paintWindow, "YELLOW", (520, 33), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (150,150,150), 2, cv2.LINE_AA)
+    # cv2.namedWindow('Paint', cv2.WINDOW_AUTOSIZE)
 
     cap = cv2.VideoCapture(0)
     print("going to generate frames function")
@@ -293,7 +291,11 @@ def generate_emoji(cap, detection_graph, sess, num_hands_detect, im_width, im_he
         newImage = cv2.resize(thresh, (50, 50))
         pred_probab, pred_class = keras_predict(model, newImage)
         print(pred_class, pred_probab)
+        if(pred_class==10):
+            break
         image_np = overlay(image_np, emojis[pred_class], 400, 300, 90, 90)
+        # image_np = cv2.rectangle(image_np, (570,422), (640,478), (122,122,122), -1)
+        # cv2.putText(image_np, "PAUSE", (582, 455), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2, cv2.LINE_AA)
 
         # cv2.imshow('Single-Threaded Detection',
         #            image_np)
@@ -329,7 +331,7 @@ def emoji_main():
     # max number of hands we want to detect/track
     num_hands_detect = 1
 
-    cv2.namedWindow('Single-Threaded Detection', cv2.WINDOW_NORMAL)
+    # cv2.namedWindow('Single-Threaded Detection', cv2.WINDOW_NORMAL)
 
     print("going to generate frames function")
     # generate_emoji(cap, detection_graph, sess, num_hands_detect, im_width, im_height, model, emojis)
