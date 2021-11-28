@@ -118,10 +118,13 @@ def generate_frames(colorIndex,paintWindow,colors,kernel,bpoints,gpoints,rpoints
                     cv2.line(paintWindow, points[i][j][k - 1], points[i][j][k], colors[i], 2)
 
     
-        cv2.imshow("Tracking", frame)
-        cv2.imshow("Paint", paintWindow)
-        cv2.imshow("mask",Mask)
-
+        # cv2.imshow("Tracking", frame)
+        # cv2.imshow("Paint", paintWindow)
+        # cv2.imshow("mask",Mask)
+        ret, buffer = cv2.imencode('.jpg', frame)
+        frame = buffer.tobytes()
+        yield (b'--frame\r\n'
+                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')  # concat frame one by one and show result
         if cv2.waitKey(1) & 0xFF == ord("q"):
             break
 
@@ -135,9 +138,13 @@ def generate_frames(colorIndex,paintWindow,colors,kernel,bpoints,gpoints,rpoints
 @app.route('/')
 def index():
     return render_template('index.html')    
-    
+
 @app.route('/video')
 def video():
+    return render_template('video.html')    
+
+@app.route('/video_feed')
+def video_feed():
     print("inside video --------------")
     cv2.namedWindow("Color detectors")
     cv2.createTrackbar("Upper Hue", "Color detectors", 162, 180,setValues)
@@ -285,9 +292,13 @@ def generate_emoji(cap, detection_graph, sess, num_hands_detect, im_width, im_he
         print(pred_class, pred_probab)
         image_np = overlay(image_np, emojis[pred_class], 400, 300, 90, 90)
 
-        cv2.imshow('Single-Threaded Detection',
-                   image_np)
-        cv2.imshow('img', img)
+        # cv2.imshow('Single-Threaded Detection',
+        #            image_np)
+        # cv2.imshow('img', img)
+        ret, buffer = cv2.imencode('.jpg', image_np)
+        image_np = buffer.tobytes()
+        yield (b'--frame\r\n'
+                b'Content-Type: image/jpeg\r\n\r\n' + image_np + b'\r\n')  # concat frame one by one and show result
 
         if cv2.waitKey(25) & 0xFF == ord('q'):
             cv2.destroyAllWindows()
@@ -300,6 +311,10 @@ keras_predict(model, np.zeros((50, 50, 1), dtype=np.uint8))
 
 @app.route('/emoji')
 def emoji():
+    return render_template('emoji.html')  
+
+@app.route('/emoji_main')
+def emoji_main():
 
     emojis = get_emojis()
 
