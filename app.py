@@ -60,7 +60,7 @@ def generate_frames(colorIndex,paintWindow,colors,kernel,bpoints,gpoints,rpoints
         
         cnts,_ = cv2.findContours(Mask.copy(), cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
         center = None
-
+        switch='Pen'
         
         if len(cnts) > 0:
             
@@ -325,52 +325,52 @@ def video():
 @app.route('/video_feed')
 def video_feed():
     print("inside video --------------")
-    # cv2.namedWindow("Color detectors")
-    # cv2.createTrackbar("Upper Hue", "Color detectors", 162, 180,setValues)
-    # cv2.createTrackbar("Upper Saturation", "Color detectors", 255, 255,setValues)
-    # cv2.createTrackbar("Upper Value", "Color detectors", 255, 255,setValues)
-    # cv2.createTrackbar("Lower Hue", "Color detectors", 88, 180,setValues)
-    # cv2.createTrackbar("Lower Saturation", "Color detectors", 108, 255,setValues)
-    # cv2.createTrackbar("Lower Value", "Color detectors", 76, 255,setValues)
+    cv2.namedWindow("Color detectors")
+    cv2.createTrackbar("Upper Hue", "Color detectors", 162, 180,setValues)
+    cv2.createTrackbar("Upper Saturation", "Color detectors", 255, 255,setValues)
+    cv2.createTrackbar("Upper Value", "Color detectors", 255, 255,setValues)
+    cv2.createTrackbar("Lower Hue", "Color detectors", 88, 180,setValues)
+    cv2.createTrackbar("Lower Saturation", "Color detectors", 108, 255,setValues)
+    cv2.createTrackbar("Lower Value", "Color detectors", 76, 255,setValues)
 
-    # bpoints = [deque(maxlen=1024)]
-    # gpoints = [deque(maxlen=1024)]
-    # rpoints = [deque(maxlen=1024)]
-    # ypoints = [deque(maxlen=1024)]
-
-
-    # blue_index = 0
-    # green_index = 0
-    # red_index = 0
-    # yellow_index = 0
+    bpoints = [deque(maxlen=1024)]
+    gpoints = [deque(maxlen=1024)]
+    rpoints = [deque(maxlen=1024)]
+    ypoints = [deque(maxlen=1024)]
 
 
-    # kernel = np.ones((5,5),np.uint8)
+    blue_index = 0
+    green_index = 0
+    red_index = 0
+    yellow_index = 0
 
-    # colors = [(255, 0, 0), (0, 255, 0), (0, 0, 255), (0, 255, 255)]
-    # colorIndex = 0
+
+    kernel = np.ones((5,5),np.uint8)
+
+    colors = [(255, 0, 0), (0, 255, 0), (0, 0, 255), (0, 255, 255)]
+    colorIndex = 0
 
 
-    # paintWindow = np.zeros((471,636,3)) + 255
-    # paintWindow = cv2.rectangle(paintWindow, (40,1), (140,65), (0,0,0), 2)
-    # paintWindow = cv2.rectangle(paintWindow, (160,1), (255,65), colors[0], -1)
-    # paintWindow = cv2.rectangle(paintWindow, (275,1), (370,65), colors[1], -1)
-    # paintWindow = cv2.rectangle(paintWindow, (390,1), (485,65), colors[2], -1)
-    # paintWindow = cv2.rectangle(paintWindow, (505,1), (600,65), colors[3], -1)
+    paintWindow = np.zeros((471,636,3)) + 255
+    paintWindow = cv2.rectangle(paintWindow, (40,1), (140,65), (0,0,0), 2)
+    paintWindow = cv2.rectangle(paintWindow, (160,1), (255,65), colors[0], -1)
+    paintWindow = cv2.rectangle(paintWindow, (275,1), (370,65), colors[1], -1)
+    paintWindow = cv2.rectangle(paintWindow, (390,1), (485,65), colors[2], -1)
+    paintWindow = cv2.rectangle(paintWindow, (505,1), (600,65), colors[3], -1)
 
-    # cv2.putText(paintWindow, "CLEAR", (49, 33), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2, cv2.LINE_AA)
-    # cv2.putText(paintWindow, "BLUE", (185, 33), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2, cv2.LINE_AA)
-    # cv2.putText(paintWindow, "GREEN", (298, 33), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2, cv2.LINE_AA)
-    # cv2.putText(paintWindow, "RED", (420, 33), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2, cv2.LINE_AA)
-    # cv2.putText(paintWindow, "YELLOW", (520, 33), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (150,150,150), 2, cv2.LINE_AA)
-    # cv2.namedWindow('Paint', cv2.WINDOW_AUTOSIZE)
+    cv2.putText(paintWindow, "CLEAR", (49, 33), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2, cv2.LINE_AA)
+    cv2.putText(paintWindow, "BLUE", (185, 33), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2, cv2.LINE_AA)
+    cv2.putText(paintWindow, "GREEN", (298, 33), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2, cv2.LINE_AA)
+    cv2.putText(paintWindow, "RED", (420, 33), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2, cv2.LINE_AA)
+    cv2.putText(paintWindow, "YELLOW", (520, 33), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (150,150,150), 2, cv2.LINE_AA)
+    cv2.namedWindow('Paint', cv2.WINDOW_AUTOSIZE)
 
-    # cap = cv2.VideoCapture(0)
-    # print("going to generate frames function")
+    cap = cv2.VideoCapture(0)
+    print("going to generate frames function")
     # generate_frames(colorIndex,paintWindow,colors,kernel,bpoints,gpoints,rpoints,ypoints,blue_index,green_index,red_index,yellow_index)
     # return redirect(url_for('index'))
-    # return Response(generate_frames(colorIndex,paintWindow,colors,kernel,bpoints,gpoints,rpoints,ypoints,blue_index,green_index,red_index,yellow_index),mimetype='multipart/x-mixed-replace; boundary=frame')
-    return Response(updated_generate_frames(),mimetype='multipart/x-mixed-replace; boundary=frame')
+    return Response(generate_frames(colorIndex,paintWindow,colors,kernel,bpoints,gpoints,rpoints,ypoints,blue_index,green_index,red_index,yellow_index),mimetype='multipart/x-mixed-replace; boundary=frame')
+    # return Response(updated_generate_frames(),mimetype='multipart/x-mixed-replace; boundary=frame')
 
 
 
