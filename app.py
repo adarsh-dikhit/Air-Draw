@@ -19,11 +19,13 @@ def setValues(x):
     
 def generate_frames(colorIndex,paintWindow,colors,kernel,bpoints,gpoints,rpoints,ypoints,blue_index,green_index,red_index,yellow_index):
     cap = cv2.VideoCapture(0)
-
+    canvas = None
     while True:    
         ret, frame = cap.read()
     
         frame = cv2.flip(frame, 1)
+        if canvas is None:
+            canvas = np.zeros_like(frame)
         hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
 
@@ -44,12 +46,14 @@ def generate_frames(colorIndex,paintWindow,colors,kernel,bpoints,gpoints,rpoints
         frame = cv2.rectangle(frame, (390,1), (485,65), colors[2], -1)
         frame = cv2.rectangle(frame, (505,1), (600,65), colors[3], -1)
         frame = cv2.rectangle(frame, (570,422), (640,478), (122,122,122), -1)
+        # frame = cv2.rectangle(frame, (10,422), (640,478), (122,122,122), -1)
         cv2.putText(frame, "CLEAR ALL", (49, 33), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2, cv2.LINE_AA)
         cv2.putText(frame, "BLUE", (185, 33), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2, cv2.LINE_AA)
         cv2.putText(frame, "GREEN", (298, 33), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2, cv2.LINE_AA)
         cv2.putText(frame, "RED", (420, 33), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2, cv2.LINE_AA)
         cv2.putText(frame, "YELLOW", (520, 33), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (150,150,150), 2, cv2.LINE_AA)
         cv2.putText(frame, "PAUSE", (582, 455), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2, cv2.LINE_AA)
+        # cv2.putText(frame, "PAUSE", (582, 455), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2, cv2.LINE_AA)
 
     
         Mask = cv2.inRange(hsv, Lower_hsv, Upper_hsv)
@@ -83,6 +87,7 @@ def generate_frames(colorIndex,paintWindow,colors,kernel,bpoints,gpoints,rpoints
                     red_index = 0
                     yellow_index = 0
 
+                    canvas[67:,:,:] = 0
                     paintWindow[67:,:,:] = 255
                 elif 160 <= center[0] <= 255:
                         colorIndex = 0 
@@ -118,13 +123,19 @@ def generate_frames(colorIndex,paintWindow,colors,kernel,bpoints,gpoints,rpoints
                 for k in range(1, len(points[i][j])):
                     if points[i][j][k - 1] is None or points[i][j][k] is None:
                         continue
-                    cv2.line(frame, points[i][j][k - 1], points[i][j][k], colors[i], 2)
+                    cv2.line(canvas, points[i][j][k - 1], points[i][j][k], colors[i], 2)
                     cv2.line(paintWindow, points[i][j][k - 1], points[i][j][k], colors[i], 2)
 
-    
-        # cv2.imshow("Tracking", frame)
-        # cv2.imshow("Paint", paintWindow)
-        # cv2.imshow("mask",Mask)
+        _ , mask = cv2.threshold(cv2.cvtColor (canvas, cv2.COLOR_BGR2GRAY), 20, 
+        255, cv2.THRESH_BINARY)
+        foreground = cv2.bitwise_and(canvas, canvas, mask = mask)
+        background = cv2.bitwise_and(frame, frame,
+        mask = cv2.bitwise_not(mask))
+        frame = cv2.add(foreground,background)
+
+        cv2.imshow("Tracking", canvas)
+        cv2.imshow("Paint", paintWindow)
+        cv2.imshow("mask",Mask)
         ret, buffer = cv2.imencode('.jpg', frame)
         frame = buffer.tobytes()
         yield (b'--frame\r\n'
