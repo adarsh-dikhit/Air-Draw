@@ -28,7 +28,6 @@ def generate_frames(colorIndex,colors,kernel,bpoints,gpoints,rpoints,ypoints,bkp
             canvas = np.zeros_like(frame)
         hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
-
         u_hue = cv2.getTrackbarPos("Upper Hue", "Color detectors")
         u_saturation = cv2.getTrackbarPos("Upper Saturation", "Color detectors")
         u_value = cv2.getTrackbarPos("Upper Value", "Color detectors")
@@ -37,8 +36,6 @@ def generate_frames(colorIndex,colors,kernel,bpoints,gpoints,rpoints,ypoints,bkp
         l_value = cv2.getTrackbarPos("Lower Value", "Color detectors")
         Upper_hsv = np.array([u_hue,u_saturation,u_value])
         Lower_hsv = np.array([l_hue,l_saturation,l_value])
-
-
     
         frame = cv2.rectangle(frame, (40,1), (140,65), (122,122,122), -1)
         frame = cv2.rectangle(frame, (160,1), (255,65), colors[0], -1)
@@ -54,13 +51,11 @@ def generate_frames(colorIndex,colors,kernel,bpoints,gpoints,rpoints,ypoints,bkp
         cv2.putText(frame, "YELLOW", (520, 33), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (150,150,150), 2, cv2.LINE_AA)
         cv2.putText(frame, "PAUSE", (582, 455), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2, cv2.LINE_AA)
         cv2.putText(frame, "ERASE", (10, 455), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2, cv2.LINE_AA)
-
-    
+  
         Mask = cv2.inRange(hsv, Lower_hsv, Upper_hsv)
         Mask = cv2.erode(Mask, kernel, iterations=1)
         Mask = cv2.morphologyEx(Mask, cv2.MORPH_OPEN, kernel)
         Mask = cv2.dilate(Mask, kernel, iterations=1)
-
         
         cnts,_ = cv2.findContours(Mask.copy(), cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
         center = None
@@ -88,10 +83,8 @@ def generate_frames(colorIndex,colors,kernel,bpoints,gpoints,rpoints,ypoints,bkp
                     green_index = 0
                     red_index = 0
                     yellow_index = 0
-                    black_index = 0
 
                     canvas[67:,:,:] = 0
-                    # paintWindow[67:,:,:] = 255
                 elif 160 <= center[0] <= 255:
                         colorIndex = 0 
                 elif 275 <= center[0] <= 370:
@@ -109,8 +102,6 @@ def generate_frames(colorIndex,colors,kernel,bpoints,gpoints,rpoints,ypoints,bkp
                     rpoints[red_index].appendleft(center)
                 elif colorIndex == 3:
                     ypoints[yellow_index].appendleft(center)
-                # elif colorIndex == 4:
-                #     bkpoints[black_index].appendleft(center)
         else:
             bpoints.append(deque(maxlen=512))
             blue_index += 1
@@ -120,25 +111,14 @@ def generate_frames(colorIndex,colors,kernel,bpoints,gpoints,rpoints,ypoints,bkp
             red_index += 1
             ypoints.append(deque(maxlen=512))
             yellow_index += 1
-            # bkpoints.append(deque(maxlen=512))
-            # black_index += 1
-
 
         points = [bpoints, gpoints, rpoints, ypoints]
         for i in range(len(points)):
-            # print(len(points[i]))
             for j in range(len(points[i])):
-                # if(colorIndex==4 and len(points[i][j])!=0):
-                #     points[i][j].popleft()
                 for k in range(1, len(points[i][j])):
                     if points[i][j][k - 1] is None or points[i][j][k] is None:
                         continue
-                    if(colorIndex==4):
-                        points[i][j][k]=0
-                        points[i][j][k - 1]=0
-                    else:
-                        cv2.line(canvas, points[i][j][k - 1], points[i][j][k], colors[i], 2)
-                    # cv2.line(paintWindow, points[i][j][k - 1], points[i][j][k], colors[i], 2)
+                    cv2.line(canvas, points[i][j][k - 1], points[i][j][k], colors[i], 2)
 
         _ , mask = cv2.threshold(cv2.cvtColor (canvas, cv2.COLOR_BGR2GRAY), 20, 
         255, cv2.THRESH_BINARY)
@@ -147,7 +127,7 @@ def generate_frames(colorIndex,colors,kernel,bpoints,gpoints,rpoints,ypoints,bkp
         mask = cv2.bitwise_not(mask))
         frame = cv2.add(foreground,background)
 
-        cv2.imshow("Tracking", canvas)
+        # cv2.imshow("Tracking", canvas)
         # cv2.imshow("Paint", paintWindow)
         cv2.imshow("mask",Mask)
         ret, buffer = cv2.imencode('.jpg', frame)
@@ -158,7 +138,6 @@ def generate_frames(colorIndex,colors,kernel,bpoints,gpoints,rpoints,ypoints,bkp
             break
     cap.release()
     cv2.destroyAllWindows()
-    # return redirect(url_for('index'))
 
 #def setValues(x):
  #  print("")
@@ -206,6 +185,7 @@ def updated_generate_frames():
     # A variable which tells when to clear canvas
     clear = False
 
+    colorIndex=0  
     while(1):
         _, frame = cap.read()
         frame = cv2.flip( frame, 1 )
@@ -213,12 +193,14 @@ def updated_generate_frames():
         # Initilize the canvas as a black image
         if canvas is None:
             canvas = np.zeros_like(frame)
-            
+        
+        colors = [(255, 0, 0), (0, 255, 0), (0, 0, 255), (0, 255, 255), (0,0,0)]      
+
         # Take the top left of the frame and apply the background subtractor
         # there    
-        top_left = frame[0: 50, 0: 50]
+        top_left = frame[422: 480, 0: 70]
         fgmask = backgroundobject.apply(top_left)
-        
+
         # Note the number of pixels that are white, this is the level of 
         # disruption.
         switch_thresh = np.sum(fgmask==255)
@@ -273,35 +255,35 @@ def updated_generate_frames():
             
             # If there were no previous points then save the detected x2,y2 
             # coordinates as x1,y1. 
+            center=[x2, y2]
+            if center[1] >= 422 and center[0] >= 570:
+                break
+            if center[1] <= 65:
+                if 40 <= center[0] <= 140: 
+                    canvas[:,:,:] = 0
+                elif 160 <= center[0] <= 255:
+                        colorIndex = 0 
+                elif 275 <= center[0] <= 370:
+                        colorIndex = 1 
+                elif 390 <= center[0] <= 485:
+                        colorIndex = 2 
+                elif 505 <= center[0] <= 600:
+                        colorIndex = 3 
+
             if x1 == 0 and y1 == 0:
                 x1,y1= x2,y2
-                
             else:
                 if switch == 'Pen':
                     # Draw the line on the canvas
-                    canvas = cv2.line(canvas, (x1,y1),
-                    (x2,y2), [255,0,0], 5)
-                    
+                    canvas = cv2.line(canvas, (x1,y1), (x2,y2), colors[colorIndex], 5)
                 else:
-                    cv2.circle(canvas, (x2, y2), 20,
-                    (0,0,0), -1)
+                    cv2.circle(canvas, (x2, y2), 20, (0,0,0), -1)
                 
-                
-            
             # After the line is drawn the new points become the previous points.
-            x1,y1= x2,y2
-            
-            # Now if the area is greater than the wiper threshold then set the 
-            # clear variable to True
-            if area > wiper_thresh:
-                cv2.putText(canvas,'Clearing Canvas',(0,200), 
-                cv2.FONT_HERSHEY_SIMPLEX, 2, (0,0,255), 1, cv2.LINE_AA)
-                clear = True 
-
+            x1,y1 = x2,y2
         else:
             # If there were no contours detected then make x1,y1 = 0
-            x1,y1 =0,0
-        
+            x1,y1 = 0,0
     
         # Now this piece of code is just for smooth drawing. (Optional)
         _ , mask = cv2.threshold(cv2.cvtColor (canvas, cv2.COLOR_BGR2GRAY), 20, 
@@ -311,14 +293,27 @@ def updated_generate_frames():
         mask = cv2.bitwise_not(mask))
         frame = cv2.add(foreground,background)
 
-        # Switch the images depending upon what we're using, pen or eraser.
+        frame = cv2.rectangle(frame, (40,1), (140,65), (122,122,122), -1)
+        frame = cv2.rectangle(frame, (160,1), (255,65), colors[0], -1)
+        frame = cv2.rectangle(frame, (275,1), (370,65), colors[1], -1)
+        frame = cv2.rectangle(frame, (390,1), (485,65), colors[2], -1)
+        frame = cv2.rectangle(frame, (505,1), (600,65), colors[3], -1)
+        frame = cv2.rectangle(frame, (570,422), (640,480), (122,122,122), -1)
+        frame = cv2.rectangle(frame, (0,422), (70,480), (122,122,122), -1)
+        cv2.putText(frame, "CLEAR ALL", (49, 33), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2, cv2.LINE_AA)
+        cv2.putText(frame, "BLUE", (185, 33), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2, cv2.LINE_AA)
+        cv2.putText(frame, "GREEN", (298, 33), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2, cv2.LINE_AA)
+        cv2.putText(frame, "RED", (420, 33), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2, cv2.LINE_AA)
+        cv2.putText(frame, "YELLOW", (520, 33), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (150,150,150), 2, cv2.LINE_AA)
+        cv2.putText(frame, "PAUSE", (582, 455), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2, cv2.LINE_AA)
+        if(switch == 'Pen'):
+            cv2.putText(frame, "ERASE", (10, 455), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2, cv2.LINE_AA)
+        else:
+            cv2.putText(frame, "PEN", (10, 455), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2, cv2.LINE_AA)
+
         if switch != 'Pen':
             cv2.circle(frame, (x1, y1), 20, (255,255,255), -1)
-            frame[0: 50, 0: 50] = eraser_img
-        else:
-            frame[0: 50, 0: 50] = pen_img
 
-        # cv2.imshow('image',frame)
         ret, buffer = cv2.imencode('.jpg', frame)
         frame = buffer.tobytes()
         yield (b'--frame\r\n'
@@ -350,31 +345,30 @@ def video():
 @app.route('/video_feed')
 def video_feed():
     print("inside video --------------")
-    cv2.namedWindow("Color detectors")
-    cv2.createTrackbar("Upper Hue", "Color detectors", 162, 180,setValues)
-    cv2.createTrackbar("Upper Saturation", "Color detectors", 255, 255,setValues)
-    cv2.createTrackbar("Upper Value", "Color detectors", 255, 255,setValues)
-    cv2.createTrackbar("Lower Hue", "Color detectors", 88, 180,setValues)
-    cv2.createTrackbar("Lower Saturation", "Color detectors", 108, 255,setValues)
-    cv2.createTrackbar("Lower Value", "Color detectors", 76, 255,setValues)
+    # cv2.namedWindow("Color detectors")
+    # cv2.createTrackbar("Upper Hue", "Color detectors", 162, 180,setValues)
+    # cv2.createTrackbar("Upper Saturation", "Color detectors", 255, 255,setValues)
+    # cv2.createTrackbar("Upper Value", "Color detectors", 255, 255,setValues)
+    # cv2.createTrackbar("Lower Hue", "Color detectors", 88, 180,setValues)
+    # cv2.createTrackbar("Lower Saturation", "Color detectors", 108, 255,setValues)
+    # cv2.createTrackbar("Lower Value", "Color detectors", 76, 255,setValues)
 
-    bpoints = [deque(maxlen=1024)]
-    gpoints = [deque(maxlen=1024)]
-    rpoints = [deque(maxlen=1024)]
-    ypoints = [deque(maxlen=1024)]
-    bkpoints = [deque(maxlen=1024)]
+    # bpoints = [deque(maxlen=1024)]
+    # gpoints = [deque(maxlen=1024)]
+    # rpoints = [deque(maxlen=1024)]
+    # ypoints = [deque(maxlen=1024)]
+    # bkpoints = [deque(maxlen=1024)]
 
-    blue_index = 0
-    green_index = 0
-    red_index = 0
-    yellow_index = 0
-    black_index = 0
+    # blue_index = 0
+    # green_index = 0
+    # red_index = 0
+    # yellow_index = 0
+    # black_index = 0
 
-    kernel = np.ones((5,5),np.uint8)
+    # kernel = np.ones((5,5),np.uint8)
 
-    colors = [(255, 0, 0), (0, 255, 0), (0, 0, 255), (0, 255, 255), (0,0,0)]
-    colorIndex = 0
-
+    # colors = [(255, 0, 0), (0, 255, 0), (0, 0, 255), (0, 255, 255), (0,0,0)]
+    # colorIndex = 0
 
     # paintWindow = np.zeros((471,636,3)) + 255
     # paintWindow = cv2.rectangle(paintWindow, (40,1), (140,65), (0,0,0), 2)
@@ -390,12 +384,12 @@ def video_feed():
     # cv2.putText(paintWindow, "YELLOW", (520, 33), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (150,150,150), 2, cv2.LINE_AA)
     # cv2.namedWindow('Paint', cv2.WINDOW_AUTOSIZE)
 
-    cap = cv2.VideoCapture(0)
+    # cap = cv2.VideoCapture(0)
     print("going to generate frames function")
     # generate_frames(colorIndex,paintWindow,colors,kernel,bpoints,gpoints,rpoints,ypoints,blue_index,green_index,red_index,yellow_index)
     # return redirect(url_for('index'))
-    return Response(generate_frames(colorIndex,colors,kernel,bpoints,gpoints,rpoints,ypoints,bkpoints,blue_index,green_index,red_index,yellow_index, black_index),mimetype='multipart/x-mixed-replace; boundary=frame')
-    # return Response(updated_generate_frames(),mimetype='multipart/x-mixed-replace; boundary=frame')
+    # return Response(generate_frames(colorIndex,colors,kernel,bpoints,gpoints,rpoints,ypoints,bkpoints,blue_index,green_index,red_index,yellow_index, black_index),mimetype='multipart/x-mixed-replace; boundary=frame')
+    return Response(updated_generate_frames(),mimetype='multipart/x-mixed-replace; boundary=frame')
 
 
 
