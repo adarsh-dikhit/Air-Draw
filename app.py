@@ -198,25 +198,25 @@ def updated_generate_frames():
 
         # Take the top left of the frame and apply the background subtractor
         # there    
-        top_left = frame[422: 480, 0: 70]
-        fgmask = backgroundobject.apply(top_left)
+        # top_left = frame[422: 480, 0: 70]
+        # fgmask = backgroundobject.apply(top_left)
 
-        # Note the number of pixels that are white, this is the level of 
-        # disruption.
-        switch_thresh = np.sum(fgmask==255)
+        # # Note the number of pixels that are white, this is the level of 
+        # # disruption.
+        # switch_thresh = np.sum(fgmask==255)
         
-        # If the disruption is greater than background threshold and there has 
-        # been some time after the previous switch then you. can change the 
-        # object type.
-        if switch_thresh>background_threshold and (time.time()-last_switch) > 1:
+        # # If the disruption is greater than background threshold and there has 
+        # # been some time after the previous switch then you. can change the 
+        # # object type.
+        # if switch_thresh>background_threshold and (time.time()-last_switch) > 1:
 
-            # Save the time of the switch. 
-            last_switch = time.time()
+        #     # Save the time of the switch. 
+        #     last_switch = time.time()
             
-            if switch == 'Pen':
-                switch = 'Eraser'
-            else:
-                switch = 'Pen'
+        #     if switch == 'Pen':
+        #         switch = 'Eraser'
+        #     else:
+        #         switch = 'Pen'
 
         # Convert BGR to HSV
         hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
@@ -258,6 +258,12 @@ def updated_generate_frames():
             center=[x2, y2]
             if center[1] >= 422 and center[0] >= 570:
                 break
+            elif (center[1] >= 422 and center[0] <= 70) and (time.time()-last_switch) > 1:
+                last_switch = time.time()
+                if switch == 'Pen':
+                    switch = 'Eraser'
+                else:
+                    switch = 'Pen'
             if center[1] <= 65:
                 if 40 <= center[0] <= 140: 
                     canvas[:,:,:] = 0
@@ -487,7 +493,7 @@ def generate_emoji(cap, detection_graph, sess, num_hands_detect, im_width, im_he
         newImage = cv2.resize(thresh, (50, 50))
         pred_probab, pred_class = keras_predict(model, newImage)
         print(pred_class, pred_probab)
-        if(pred_class==10):
+        if(pred_class==8):
             break
         image_np = overlay(image_np, emojis[pred_class], 400, 300, 90, 90)
         # image_np = cv2.rectangle(image_np, (570,422), (640,478), (122,122,122), -1)
