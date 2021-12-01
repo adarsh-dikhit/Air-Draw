@@ -17,7 +17,7 @@ app=Flask(__name__)
 def setValues(x):
     print("")
     
-def generate_frames(colorIndex,paintWindow,colors,kernel,bpoints,gpoints,rpoints,ypoints,blue_index,green_index,red_index,yellow_index):
+def generate_frames(colorIndex,colors,kernel,bpoints,gpoints,rpoints,ypoints,bkpoints, blue_index,green_index,red_index,yellow_index, black_index):
     cap = cv2.VideoCapture(0)
     canvas = None
     while True:    
@@ -45,15 +45,15 @@ def generate_frames(colorIndex,paintWindow,colors,kernel,bpoints,gpoints,rpoints
         frame = cv2.rectangle(frame, (275,1), (370,65), colors[1], -1)
         frame = cv2.rectangle(frame, (390,1), (485,65), colors[2], -1)
         frame = cv2.rectangle(frame, (505,1), (600,65), colors[3], -1)
-        frame = cv2.rectangle(frame, (570,422), (640,478), (122,122,122), -1)
-        # frame = cv2.rectangle(frame, (10,422), (640,478), (122,122,122), -1)
+        frame = cv2.rectangle(frame, (570,422), (640,480), (122,122,122), -1)
+        frame = cv2.rectangle(frame, (0,422), (70,480), (122,122,122), -1)
         cv2.putText(frame, "CLEAR ALL", (49, 33), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2, cv2.LINE_AA)
         cv2.putText(frame, "BLUE", (185, 33), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2, cv2.LINE_AA)
         cv2.putText(frame, "GREEN", (298, 33), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2, cv2.LINE_AA)
         cv2.putText(frame, "RED", (420, 33), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2, cv2.LINE_AA)
         cv2.putText(frame, "YELLOW", (520, 33), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (150,150,150), 2, cv2.LINE_AA)
         cv2.putText(frame, "PAUSE", (582, 455), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2, cv2.LINE_AA)
-        # cv2.putText(frame, "PAUSE", (582, 455), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2, cv2.LINE_AA)
+        cv2.putText(frame, "ERASE", (10, 455), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2, cv2.LINE_AA)
 
     
         Mask = cv2.inRange(hsv, Lower_hsv, Upper_hsv)
@@ -64,7 +64,6 @@ def generate_frames(colorIndex,paintWindow,colors,kernel,bpoints,gpoints,rpoints
         
         cnts,_ = cv2.findContours(Mask.copy(), cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
         center = None
-        switch='Pen'
         
         if len(cnts) > 0:
             
@@ -74,21 +73,25 @@ def generate_frames(colorIndex,paintWindow,colors,kernel,bpoints,gpoints,rpoints
             M = cv2.moments(cnt)
             center = (int(M['m10'] / M['m00']), int(M['m01'] / M['m00']))
             if center[1] >= 422 and center[0] >= 570:
-                  break
+                break
+            if center[1] >= 422 and center[0] <= 70:
+                colorIndex = 4
             if center[1] <= 65:
                 if 40 <= center[0] <= 140: 
                     bpoints = [deque(maxlen=512)]
                     gpoints = [deque(maxlen=512)]
                     rpoints = [deque(maxlen=512)]
                     ypoints = [deque(maxlen=512)]
+                    bkpoints = [deque(maxlen=512)]
 
                     blue_index = 0
                     green_index = 0
                     red_index = 0
                     yellow_index = 0
+                    black_index = 0
 
                     canvas[67:,:,:] = 0
-                    paintWindow[67:,:,:] = 255
+                    # paintWindow[67:,:,:] = 255
                 elif 160 <= center[0] <= 255:
                         colorIndex = 0 
                 elif 275 <= center[0] <= 370:
@@ -106,6 +109,8 @@ def generate_frames(colorIndex,paintWindow,colors,kernel,bpoints,gpoints,rpoints
                     rpoints[red_index].appendleft(center)
                 elif colorIndex == 3:
                     ypoints[yellow_index].appendleft(center)
+                # elif colorIndex == 4:
+                #     bkpoints[black_index].appendleft(center)
         else:
             bpoints.append(deque(maxlen=512))
             blue_index += 1
@@ -115,16 +120,25 @@ def generate_frames(colorIndex,paintWindow,colors,kernel,bpoints,gpoints,rpoints
             red_index += 1
             ypoints.append(deque(maxlen=512))
             yellow_index += 1
+            # bkpoints.append(deque(maxlen=512))
+            # black_index += 1
 
 
         points = [bpoints, gpoints, rpoints, ypoints]
         for i in range(len(points)):
+            # print(len(points[i]))
             for j in range(len(points[i])):
+                # if(colorIndex==4 and len(points[i][j])!=0):
+                #     points[i][j].popleft()
                 for k in range(1, len(points[i][j])):
                     if points[i][j][k - 1] is None or points[i][j][k] is None:
                         continue
-                    cv2.line(canvas, points[i][j][k - 1], points[i][j][k], colors[i], 2)
-                    cv2.line(paintWindow, points[i][j][k - 1], points[i][j][k], colors[i], 2)
+                    if(colorIndex==4):
+                        points[i][j][k]=0
+                        points[i][j][k - 1]=0
+                    else:
+                        cv2.line(canvas, points[i][j][k - 1], points[i][j][k], colors[i], 2)
+                    # cv2.line(paintWindow, points[i][j][k - 1], points[i][j][k], colors[i], 2)
 
         _ , mask = cv2.threshold(cv2.cvtColor (canvas, cv2.COLOR_BGR2GRAY), 20, 
         255, cv2.THRESH_BINARY)
@@ -134,7 +148,7 @@ def generate_frames(colorIndex,paintWindow,colors,kernel,bpoints,gpoints,rpoints
         frame = cv2.add(foreground,background)
 
         cv2.imshow("Tracking", canvas)
-        cv2.imshow("Paint", paintWindow)
+        # cv2.imshow("Paint", paintWindow)
         cv2.imshow("mask",Mask)
         ret, buffer = cv2.imencode('.jpg', frame)
         frame = buffer.tobytes()
@@ -348,39 +362,39 @@ def video_feed():
     gpoints = [deque(maxlen=1024)]
     rpoints = [deque(maxlen=1024)]
     ypoints = [deque(maxlen=1024)]
-
+    bkpoints = [deque(maxlen=1024)]
 
     blue_index = 0
     green_index = 0
     red_index = 0
     yellow_index = 0
-
+    black_index = 0
 
     kernel = np.ones((5,5),np.uint8)
 
-    colors = [(255, 0, 0), (0, 255, 0), (0, 0, 255), (0, 255, 255)]
+    colors = [(255, 0, 0), (0, 255, 0), (0, 0, 255), (0, 255, 255), (0,0,0)]
     colorIndex = 0
 
 
-    paintWindow = np.zeros((471,636,3)) + 255
-    paintWindow = cv2.rectangle(paintWindow, (40,1), (140,65), (0,0,0), 2)
-    paintWindow = cv2.rectangle(paintWindow, (160,1), (255,65), colors[0], -1)
-    paintWindow = cv2.rectangle(paintWindow, (275,1), (370,65), colors[1], -1)
-    paintWindow = cv2.rectangle(paintWindow, (390,1), (485,65), colors[2], -1)
-    paintWindow = cv2.rectangle(paintWindow, (505,1), (600,65), colors[3], -1)
+    # paintWindow = np.zeros((471,636,3)) + 255
+    # paintWindow = cv2.rectangle(paintWindow, (40,1), (140,65), (0,0,0), 2)
+    # paintWindow = cv2.rectangle(paintWindow, (160,1), (255,65), colors[0], -1)
+    # paintWindow = cv2.rectangle(paintWindow, (275,1), (370,65), colors[1], -1)
+    # paintWindow = cv2.rectangle(paintWindow, (390,1), (485,65), colors[2], -1)
+    # paintWindow = cv2.rectangle(paintWindow, (505,1), (600,65), colors[3], -1)
 
-    cv2.putText(paintWindow, "CLEAR", (49, 33), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2, cv2.LINE_AA)
-    cv2.putText(paintWindow, "BLUE", (185, 33), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2, cv2.LINE_AA)
-    cv2.putText(paintWindow, "GREEN", (298, 33), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2, cv2.LINE_AA)
-    cv2.putText(paintWindow, "RED", (420, 33), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2, cv2.LINE_AA)
-    cv2.putText(paintWindow, "YELLOW", (520, 33), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (150,150,150), 2, cv2.LINE_AA)
-    cv2.namedWindow('Paint', cv2.WINDOW_AUTOSIZE)
+    # cv2.putText(paintWindow, "CLEAR", (49, 33), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2, cv2.LINE_AA)
+    # cv2.putText(paintWindow, "BLUE", (185, 33), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2, cv2.LINE_AA)
+    # cv2.putText(paintWindow, "GREEN", (298, 33), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2, cv2.LINE_AA)
+    # cv2.putText(paintWindow, "RED", (420, 33), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2, cv2.LINE_AA)
+    # cv2.putText(paintWindow, "YELLOW", (520, 33), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (150,150,150), 2, cv2.LINE_AA)
+    # cv2.namedWindow('Paint', cv2.WINDOW_AUTOSIZE)
 
     cap = cv2.VideoCapture(0)
     print("going to generate frames function")
     # generate_frames(colorIndex,paintWindow,colors,kernel,bpoints,gpoints,rpoints,ypoints,blue_index,green_index,red_index,yellow_index)
     # return redirect(url_for('index'))
-    return Response(generate_frames(colorIndex,paintWindow,colors,kernel,bpoints,gpoints,rpoints,ypoints,blue_index,green_index,red_index,yellow_index),mimetype='multipart/x-mixed-replace; boundary=frame')
+    return Response(generate_frames(colorIndex,colors,kernel,bpoints,gpoints,rpoints,ypoints,bkpoints,blue_index,green_index,red_index,yellow_index, black_index),mimetype='multipart/x-mixed-replace; boundary=frame')
     # return Response(updated_generate_frames(),mimetype='multipart/x-mixed-replace; boundary=frame')
 
 
