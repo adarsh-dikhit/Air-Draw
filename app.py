@@ -511,7 +511,7 @@ def generate_emoji(cap, detection_graph, sess, num_hands_detect, im_width, im_he
             cv2.destroyAllWindows()
             break
 
-model = load_model('emojinator.h5')
+model = load_model('emojinator files/emojinator.h5')
 detection_graph, sess = detector_utils.load_inference_graph()
 
 keras_predict(model, np.zeros((50, 50, 1), dtype=np.uint8))
