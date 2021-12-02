@@ -150,8 +150,8 @@ def updated_generate_frames():
     cap = cv2.VideoCapture(0)
 
     # Load these 2 images and resize them to the same size.
-    pen_img = cv2.resize(cv2.imread('pen.png',1), (50, 50))
-    eraser_img = cv2.resize(cv2.imread('eraser.jpg',1), (50, 50))
+    # pen_img = cv2.resize(cv2.imread('air canvas files/pen.png',1), (50, 50))
+    # eraser_img = cv2.resize(cv2.imread('air canvas files/eraser.jpg',1), (50, 50))
 
     kernel = np.ones((5,5),np.uint8)
 
@@ -418,7 +418,7 @@ def keras_process_image(img):
 
 
 def get_emojis():
-    emojis_folder = 'hand_emo/'
+    emojis_folder = 'emojinator files/hand_emo/'
     emojis = []
     for emoji in range(len(os.listdir(emojis_folder))):
         print(emoji)
