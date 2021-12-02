@@ -493,8 +493,8 @@ def generate_emoji(cap, detection_graph, sess, num_hands_detect, im_width, im_he
         newImage = cv2.resize(thresh, (50, 50))
         pred_probab, pred_class = keras_predict(model, newImage)
         print(pred_class, pred_probab)
-        if(pred_class==8):
-            break
+        # if(pred_class==8):
+        #     break
         image_np = overlay(image_np, emojis[pred_class], 400, 300, 90, 90)
         # image_np = cv2.rectangle(image_np, (570,422), (640,478), (122,122,122), -1)
         # cv2.putText(image_np, "PAUSE", (582, 455), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2, cv2.LINE_AA)
