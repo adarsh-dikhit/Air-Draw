@@ -12,15 +12,15 @@
          alt="HTML">
   </a>
   <a href="">
-    <img src="https://github.com/shanky1947/Tensorflow-2.0/blob/master/badges/uses-tensorflow.svg"
+    <img src="https://github.com/shanky1947/Air-Draw/blob/master/badges/uses-tensorflow.svg"
          alt="CSS">
   </a>
   <a href="">
-    <img src="https://github.com/shanky1947/Tensorflow-2.0/blob/master/badges/uses-keras.svg"
+    <img src="https://github.com/shanky1947/Air-Draw/blob/master/badges/uses-keras.svg"
          alt="Git">
   </a>
     <a href="">
-    <img src="https://github.com/shanky1947/Automation-in-Spotify/blob/master/badges/made-by-shashank.svg"
+    <img src="https://github.com/shanky1947/Air-Draw/blob/master/badges/uses-opencv.svg"
          alt="Javascript">
   </a>
 </p>
