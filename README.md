@@ -25,4 +25,8 @@
   </a>
 </p>
 
+## Aim
 Aim of this project is to make an air canvas for user to draw in air and to make an emojinator which can detect any hand emoji as per user’s action in front of the video feed.
+
+## Youtube Demo Link
+https://youtu.be/HHd3BCBy2B8
