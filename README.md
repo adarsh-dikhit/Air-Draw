@@ -25,5 +25,4 @@
   </a>
 </p>
 
-
-It uses selenium to automate spotify to add songs from local directly to the playlist automatically
+Aim of this project is to make an air canvas for user to draw in air and to make an emojinator which can detect any hand emoji as per user’s action in front of the video feed.
