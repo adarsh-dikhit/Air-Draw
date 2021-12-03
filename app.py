@@ -3,7 +3,7 @@
 
 # In[ ]:
 
-from utils import detector_utils as detector_utils
+from emojinator_files.utils import detector_utils as detector_utils
 import cv2
 from keras.models import load_model
 import numpy as np
