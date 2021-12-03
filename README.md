@@ -12,11 +12,11 @@
          alt="HTML">
   </a>
   <a href="">
-    <img src="https://github.com/shanky1947/Automation-in-Spotify/blob/master/badges/uses-selenium.svg"
+    <img src="https://github.com/shanky1947/Tensorflow-2.0/blob/master/badges/uses-tensorflow.svg"
          alt="CSS">
   </a>
   <a href="">
-    <img src="https://github.com/shanky1947/Automation-in-Spotify/blob/master/badges/made-for-spotify.svg"
+    <img src="https://github.com/shanky1947/Tensorflow-2.0/blob/master/badges/uses-keras.svg"
          alt="Git">
   </a>
     <a href="">
